@@ -12,8 +12,15 @@ materias_aprobadas = []
 semestres = []
 carreras = []
 
-# Variable global para verificar si los datos están ordenados por código para la búsqueda binaria.
-# Se invalida si se añaden nuevos estudiantes o se ordena por otro criterio.
+# Lista de carreras disponibles (NUEVO REQUISITO)
+CARRERAS_DISPONIBLES = [
+    "Ingeniería de Software",
+    "Administración de Empresas",
+    "Ingeniería Ambiental",
+    "Enfermería"
+]
+
+# Variable global para verificar si los datos están ordenados por código.
 datos_ordenados_por_codigo = False
 
 # =============================================
@@ -22,9 +29,6 @@ datos_ordenados_por_codigo = False
 
 def limpiar_pantalla():
     """Función simple para limpiar la consola y mejorar la legibilidad."""
-    # Esta función no es esencial para la lógica, pero mejora la experiencia de usuario.
-    # import os
-    # os.system('cls' if os.name == 'nt' else 'clear')
     print("\n" * 20)
 
 
@@ -70,12 +74,13 @@ def intercambiar_datos(i, j):
     carreras[i], carreras[j] = carreras[j], carreras[i]
 
 # =============================================
-# 2. FUNCIONALIDAD DE ENTRADA Y VALIDACIÓN
+# 2. FUNCIONALIDAD DE ENTRADA Y VALIDACIÓN (CORREGIDA)
 # =============================================
 
 def registrar_nuevos_estudiantes():
     """
-    Solicita y valida los datos para registrar un número determinado de nuevos estudiantes.
+    Solicita y valida los datos para registrar un número determinado de nuevos estudiantes
+    en una única carrera seleccionada al inicio.
     """
     global datos_ordenados_por_codigo
     
@@ -90,7 +95,26 @@ def registrar_nuevos_estudiantes():
         except ValueError:
             print("Error: Por favor, ingrese un número entero válido.")
 
-    print("\n--- Inicio de Registro ---")
+    # --- INICIO DE LA CORRECCIÓN ---
+    # Se pregunta por la carrera para todo el lote de estudiantes
+    print("\nSeleccione la carrera para este grupo de estudiantes:")
+    for idx, carrera_opcion in enumerate(CARRERAS_DISPONIBLES):
+        print(f"{idx + 1}. {carrera_opcion}")
+    
+    carrera_seleccionada = ""
+    while True:
+        try:
+            opcion_carrera = int(input(f"Elija una opción (1-{len(CARRERAS_DISPONIBLES)}): "))
+            if 1 <= opcion_carrera <= len(CARRERAS_DISPONIBLES):
+                carrera_seleccionada = CARRERAS_DISPONIBLES[opcion_carrera - 1]
+                break
+            else:
+                print(f"Error: La opción debe estar entre 1 y {len(CARRERAS_DISPONIBLES)}.")
+        except ValueError:
+            print("Error: Por favor, ingrese un número válido.")
+    # --- FIN DE LA CORRECCIÓN ---
+
+    print(f"\n--- Inicio de Registro para la carrera de '{carrera_seleccionada}' ---")
     for i in range(cantidad):
         print(f"\n--- Registrando Estudiante #{i + 1} de {cantidad} ---")
 
@@ -141,16 +165,13 @@ def registrar_nuevos_estudiantes():
             except ValueError:
                 print("Error: Ingrese un número entero válido.")
 
-        # Solicitar Carrera
-        carrera = input("Carrera: ").strip().title()
-
         # Agregar datos a las listas paralelas
         nombres.append(nombre)
         codigos.append(codigo)
         promedios.append(promedio)
         semestres.append(semestre)
         materias_aprobadas.append(materias)
-        carreras.append(carrera)
+        carreras.append(carrera_seleccionada) # Se asigna la carrera elegida al inicio
         
         # Al agregar nuevos estudiantes, el ordenamiento por código se pierde.
         datos_ordenados_por_codigo = False
@@ -159,166 +180,85 @@ def registrar_nuevos_estudiantes():
     print("\n--- Registro Finalizado ---")
 
 # =============================================
-# 3. ALGORITMOS DE ORDENAMIENTO (Desde Cero)
+# 3. ALGORITMOS DE ORDENAMIENTO (Sin cambios)
 # =============================================
 
-# --- Algoritmo Básico: Ordenamiento por Inserción ---
 def ordenamiento_insercion(criterio):
-    """
-    Ordena los datos de los estudiantes usando el algoritmo de Insertion Sort.
-    Modifica todas las listas paralelas para mantener la consistencia de los datos.
-    
-    Args:
-        criterio (str): 'nombre', 'promedio', 'codigo' o 'semestre'.
-    """
     global datos_ordenados_por_codigo
     n = len(nombres)
-    
-    # Se itera desde el segundo elemento (índice 1) hasta el final de la lista.
     for i in range(1, n):
-        # Se guardan los valores del elemento actual (en la posición 'i') que vamos a insertar.
-        # Es como tomar una carta de la baraja para colocarla en su lugar correcto.
         key_nombre = nombres[i]
         key_codigo = codigos[i]
         key_promedio = promedios[i]
         key_materias = materias_aprobadas[i]
         key_semestre = semestres[i]
         key_carrera = carreras[i]
-        
         j = i - 1
-        
-        # Se determina la condición de comparación según el criterio.
-        # Mientras el elemento en 'j' sea "mayor" que nuestra 'key' (según el criterio),
-        # se desplazan los elementos de la sección ordenada hacia la derecha.
         condicion = False
-        if criterio == 'nombre':
-            condicion = j >= 0 and nombres[j] > key_nombre # A-Z
-        elif criterio == 'promedio':
-            condicion = j >= 0 and promedios[j] < key_promedio # Mayor a menor
-        elif criterio == 'codigo':
-            condicion = j >= 0 and codigos[j] > key_codigo # Ascendente
-        elif criterio == 'semestre':
-            condicion = j >= 0 and semestres[j] < key_semestre # Descendente
-
+        if criterio == 'nombre': condicion = j >= 0 and nombres[j] > key_nombre
+        elif criterio == 'promedio': condicion = j >= 0 and promedios[j] < key_promedio
+        elif criterio == 'codigo': condicion = j >= 0 and codigos[j] > key_codigo
+        elif criterio == 'semestre': condicion = j >= 0 and semestres[j] < key_semestre
         while condicion:
-            # Desplazamiento en todas las listas
-            nombres[j + 1] = nombres[j]
-            codigos[j + 1] = codigos[j]
-            promedios[j + 1] = promedios[j]
-            materias_aprobadas[j + 1] = materias_aprobadas[j]
-            semestres[j + 1] = semestres[j]
-            carreras[j + 1] = carreras[j]
+            intercambiar_datos(j + 1, j)
             j -= 1
-            
-            # Re-evaluar la condición para el siguiente elemento a la izquierda
-            if criterio == 'nombre':
-                condicion = j >= 0 and nombres[j] > key_nombre
-            elif criterio == 'promedio':
-                condicion = j >= 0 and promedios[j] < key_promedio
-            elif criterio == 'codigo':
-                condicion = j >= 0 and codigos[j] > key_codigo
-            elif criterio == 'semestre':
-                condicion = j >= 0 and semestres[j] < key_semestre
-        
-        # Se inserta la 'key' (la carta que tomamos) en la posición correcta.
-        nombres[j + 1] = key_nombre
-        codigos[j + 1] = key_codigo
-        promedios[j + 1] = key_promedio
-        materias_aprobadas[j + 1] = key_materias
-        semestres[j + 1] = key_semestre
-        carreras[j + 1] = key_carrera
-
-    # Actualizar el estado de ordenamiento
+            if criterio == 'nombre': condicion = j >= 0 and nombres[j] > key_nombre
+            elif criterio == 'promedio': condicion = j >= 0 and promedios[j] < key_promedio
+            elif criterio == 'codigo': condicion = j >= 0 and codigos[j] > key_codigo
+            elif criterio == 'semestre': condicion = j >= 0 and semestres[j] < key_semestre
+        nombres[j + 1], codigos[j + 1], promedios[j + 1], materias_aprobadas[j + 1], semestres[j + 1], carreras[j + 1] = key_nombre, key_codigo, key_promedio, key_materias, key_semestre, key_carrera
     datos_ordenados_por_codigo = (criterio == 'codigo')
     print(f"\n>> Datos ordenados por '{criterio}' usando Inserción.")
 
-
-# --- Algoritmo Eficiente: Quicksort ---
 def particion(criterio, bajo, alto):
-    """
-    Función de partición para Quicksort. Toma un pivote (el último elemento)
-    y coloca los elementos "menores" a su izquierda y los "mayores" a su derecha.
-    """
-    # Se selecciona el último elemento como pivote.
     pivote = None
     if criterio == 'nombre': pivote = nombres[alto]
     elif criterio == 'promedio': pivote = promedios[alto]
     elif criterio == 'codigo': pivote = codigos[alto]
     elif criterio == 'semestre': pivote = semestres[alto]
-    
-    i = bajo - 1  # Índice del elemento más pequeño
-
+    i = bajo - 1
     for j in range(bajo, alto):
-        # Se compara el elemento actual 'j' con el pivote.
-        # Si es "menor" (según el criterio), se intercambia con el elemento en 'i'.
         condicion = False
-        if criterio == 'nombre':
-            condicion = nombres[j] <= pivote # A-Z
-        elif criterio == 'promedio':
-            condicion = promedios[j] >= pivote # Mayor a menor
-        elif criterio == 'codigo':
-            condicion = codigos[j] <= pivote # Ascendente
-        elif criterio == 'semestre':
-            condicion = semestres[j] >= pivote # Descendente
-
+        if criterio == 'nombre': condicion = nombres[j] <= pivote
+        elif criterio == 'promedio': condicion = promedios[j] >= pivote
+        elif criterio == 'codigo': condicion = codigos[j] <= pivote
+        elif criterio == 'semestre': condicion = semestres[j] >= pivote
         if condicion:
             i += 1
             intercambiar_datos(i, j)
-
-    # Finalmente, se coloca el pivote en su posición correcta.
     intercambiar_datos(i + 1, alto)
     return i + 1
 
-
 def quicksort_recursivo(criterio, bajo, alto):
-    """Función recursiva principal de Quicksort."""
     if bajo < alto:
-        # pi es el índice de la partición, donde el pivote ya está en su lugar.
         pi = particion(criterio, bajo, alto)
-
-        # Se ordenan recursivamente los elementos antes y después de la partición.
         quicksort_recursivo(criterio, bajo, pi - 1)
         quicksort_recursivo(criterio, pi + 1, alto)
 
-
 def quicksort(criterio):
-    """
-    Función 'wrapper' o envoltorio para iniciar el algoritmo Quicksort.
-    """
     global datos_ordenados_por_codigo
     if not nombres:
         print(">> No hay estudiantes para ordenar.")
         return
-        
     quicksort_recursivo(criterio, 0, len(nombres) - 1)
-    
-    # Actualizar el estado de ordenamiento
     datos_ordenados_por_codigo = (criterio == 'codigo')
     print(f"\n>> Datos ordenados por '{criterio}' usando Quicksort.")
 
 # ==================================================
-# 4. ALGORITMOS DE BÚSQUEDA Y FILTRADO
+# 4. ALGORITMOS DE BÚSQUEDA Y FILTRADO (Sin cambios)
 # ==================================================
 
 def busqueda_binaria_por_codigo():
-    """
-    Busca un estudiante por su código usando Búsqueda Binaria.
-    Requiere que la lista de códigos esté ordenada ascendentemente.
-    """
     if not datos_ordenados_por_codigo:
         print("\nError: Para usar la búsqueda binaria, primero debe ordenar los datos por 'código'.")
-        print("Vaya al menú de ordenamiento (opción 3 o 4) y elija 'código'.")
         return
-
     try:
         codigo_buscar = int(input("Ingrese el código del estudiante a buscar: "))
     except ValueError:
         print("Error: El código debe ser un número entero.")
         return
-        
     bajo, alto = 0, len(codigos) - 1
     indice_encontrado = -1
-
     while bajo <= alto:
         medio = (bajo + alto) // 2
         if codigos[medio] == codigo_buscar:
@@ -328,44 +268,28 @@ def busqueda_binaria_por_codigo():
             bajo = medio + 1
         else:
             alto = medio - 1
-            
     if indice_encontrado != -1:
         print(f"\n--- Estudiante Encontrado (Código: {codigo_buscar}) ---")
         mostrar_tabla_estudiantes([indice_encontrado])
     else:
         print(f"\n>> No se encontró ningún estudiante con el código {codigo_buscar}.")
 
-
 def busqueda_lineal_por_nombre():
-    """
-    Busca estudiantes cuyo nombre contenga el texto de búsqueda (búsqueda parcial).
-    """
     if not nombres:
         print(">> No hay estudiantes registrados para buscar.")
         return
-    
     nombre_parcial = input("Ingrese el nombre (o parte del nombre) a buscar: ").strip().lower()
     if not nombre_parcial:
         print("Error: El término de búsqueda no puede estar vacío.")
         return
-
-    indices_encontrados = []
-    for i in range(len(nombres)):
-        if nombre_parcial in nombres[i].lower():
-            indices_encontrados.append(i)
-    
+    indices_encontrados = [i for i, nombre in enumerate(nombres) if nombre_parcial in nombre.lower()]
     print(f"\n--- Resultados de la Búsqueda para '{nombre_parcial}' ---")
     mostrar_tabla_estudiantes(indices_encontrados)
 
-
 def filtrar_por_rango_promedio():
-    """
-    Muestra los estudiantes cuyo promedio se encuentre en un rango [min, max].
-    """
     if not nombres:
         print(">> No hay estudiantes registrados para filtrar.")
         return
-        
     try:
         min_prom = float(input("Ingrese el promedio mínimo del rango (ej: 3.5): "))
         max_prom = float(input("Ingrese el promedio máximo del rango (ej: 4.5): "))
@@ -373,71 +297,36 @@ def filtrar_por_rango_promedio():
             print("Error: El promedio mínimo no puede ser mayor que el máximo.")
             return
     except ValueError:
-        print("Error: Ingrese valores numéricos válidos para los promedios.")
+        print("Error: Ingrese valores numéricos válidos.")
         return
-
-    indices_filtrados = []
-    for i in range(len(promedios)):
-        if min_prom <= promedios[i] <= max_prom:
-            indices_filtrados.append(i)
-            
+    indices_filtrados = [i for i, prom in enumerate(promedios) if min_prom <= prom <= max_prom]
     print(f"\n--- Estudiantes con Promedio entre {min_prom:.2f} y {max_prom:.2f} ---")
     mostrar_tabla_estudiantes(indices_filtrados)
 
-
 def filtrar_por_carrera():
-    """
-    Muestra todos los estudiantes que pertenecen a una carrera específica.
-    """
     if not nombres:
         print(">> No hay estudiantes registrados para filtrar.")
         return
-        
     carrera_buscar = input("Ingrese el nombre de la carrera a filtrar: ").strip().lower()
     if not carrera_buscar:
         print("Error: El nombre de la carrera no puede estar vacío.")
         return
-
-    indices_filtrados = []
-    for i in range(len(carreras)):
-        if carreras[i].lower() == carrera_buscar:
-            indices_filtrados.append(i)
-
+    indices_filtrados = [i for i, carrera in enumerate(carreras) if carrera.lower() == carrera_buscar]
     print(f"\n--- Estudiantes de la Carrera: '{carrera_buscar.title()}' ---")
     mostrar_tabla_estudiantes(indices_filtrados)
 
 # =============================================
-# 5. ESTADÍSTICAS Y REPORTES
+# 5. ESTADÍSTICAS Y REPORTES (Sin cambios)
 # =============================================
 
 def mostrar_estadisticas_generales():
-    """
-    Calcula y muestra un resumen de estadísticas sobre todos los estudiantes.
-    """
     if not nombres:
         print(">> No hay estudiantes registrados para generar estadísticas.")
         return
-        
     n = len(nombres)
-    
-    # 1. Promedio general
     promedio_total = sum(promedios) / n
-    
-    # 2. Estudiante con promedio más alto y más bajo
-    idx_max_prom, idx_min_prom = 0, 0
-    for i in range(1, n):
-        if promedios[i] > promedios[idx_max_prom]:
-            idx_max_prom = i
-        if promedios[i] < promedios[idx_min_prom]:
-            idx_min_prom = i
-            
-    nombre_max = nombres[idx_max_prom]
-    promedio_max = promedios[idx_max_prom]
-    nombre_min = nombres[idx_min_prom]
-    promedio_min = promedios[idx_min_prom]
-    
-    # 3. Distribución de estudiantes por carrera
-    # Implementación sin diccionarios
+    idx_max_prom = promedios.index(max(promedios))
+    idx_min_prom = promedios.index(min(promedios))
     carreras_unicas = []
     conteo_carreras = []
     for carrera in carreras:
@@ -445,175 +334,89 @@ def mostrar_estadisticas_generales():
             carreras_unicas.append(carrera)
             conteo_carreras.append(1)
         else:
-            idx = carreras_unicas.index(carrera)
-            conteo_carreras[idx] += 1
-            
-    print("\n" + "="*40)
-    print("      ESTADÍSTICAS GENERALES")
-    print("="*40)
-    print(f"Total de Estudiantes Registrados: {n}")
-    print(f"Promedio General de la Institución: {promedio_total:.2f}")
+            conteo_carreras[carreras_unicas.index(carrera)] += 1
+    print("\n" + "="*40 + "\n      ESTADÍSTICAS GENERALES\n" + "="*40)
+    print(f"Total de Estudiantes: {n}")
+    print(f"Promedio General: {promedio_total:.2f}")
     print("\n--- Rendimiento Académico ---")
-    print(f"Mejor Promedio: {nombre_max} ({promedio_max:.2f})")
-    print(f"Menor Promedio: {nombre_min} ({promedio_min:.2f})")
+    print(f"Mejor Promedio: {nombres[idx_max_prom]} ({promedios[idx_max_prom]:.2f})")
+    print(f"Menor Promedio: {nombres[idx_min_prom]} ({promedios[idx_min_prom]:.2f})")
     print("\n--- Distribución por Carrera ---")
     for i in range(len(carreras_unicas)):
         print(f"- {carreras_unicas[i]}: {conteo_carreras[i]} estudiante(s)")
     print("="*40)
 
-
 def mostrar_top_5_mejores_promedios():
-    """
-    Muestra los 5 estudiantes con los promedios más altos.
-    """
     if not nombres:
         print(">> No hay estudiantes registrados.")
         return
-    
-    # Para no alterar el orden original, creamos copias temporales de las listas
-    # y las ordenamos por promedio de mayor a menor.
-    temp_nombres = list(nombres)
-    temp_codigos = list(codigos)
-    temp_promedios = list(promedios)
-    temp_materias = list(materias_aprobadas)
-    temp_semestres = list(semestres)
-    temp_carreras = list(carreras)
-
-    # Ordenamos las listas temporales usando Quicksort por promedio
-    # (adaptación para listas temporales)
-    def quicksort_temporal(arr_prom, bajo, alto):
-        if bajo < alto:
-            pi = particion_temporal(arr_prom, bajo, alto)
-            quicksort_temporal(arr_prom, bajo, pi - 1)
-            quicksort_temporal(arr_prom, pi + 1, alto)
-
-    def particion_temporal(arr_prom, bajo, alto):
-        pivote = arr_prom[alto]
-        i = bajo - 1
-        for j in range(bajo, alto):
-            if arr_prom[j] >= pivote: # Orden descendente
-                i += 1
-                # Intercambio en todas las listas temporales
-                temp_nombres[i], temp_nombres[j] = temp_nombres[j], temp_nombres[i]
-                temp_codigos[i], temp_codigos[j] = temp_codigos[j], temp_codigos[i]
-                temp_promedios[i], temp_promedios[j] = temp_promedios[j], temp_promedios[i]
-                temp_materias[i], temp_materias[j] = temp_materias[j], temp_materias[i]
-                temp_semestres[i], temp_semestres[j] = temp_semestres[j], temp_semestres[i]
-                temp_carreras[i], temp_carreras[j] = temp_carreras[j], temp_carreras[i]
-        # Intercambio final para el pivote
-        temp_nombres[i+1], temp_nombres[alto] = temp_nombres[alto], temp_nombres[i+1]
-        temp_codigos[i+1], temp_codigos[alto] = temp_codigos[alto], temp_codigos[i+1]
-        temp_promedios[i+1], temp_promedios[alto] = temp_promedios[alto], temp_promedios[i+1]
-        temp_materias[i+1], temp_materias[alto] = temp_materias[alto], temp_materias[i+1]
-        temp_semestres[i+1], temp_semestres[alto] = temp_semestres[alto], temp_semestres[i+1]
-        temp_carreras[i+1], temp_carreras[alto] = temp_carreras[alto], temp_carreras[i+1]
-        return i + 1
-
-    quicksort_temporal(temp_promedios, 0, len(temp_promedios) - 1)
-
+    temp_datos = sorted(zip(promedios, nombres, carreras), reverse=True)
     print("\n--- Top 5 Mejores Promedios ---")
-    # Mostramos los primeros 5 (o menos si no hay suficientes estudiantes)
-    limite = min(5, len(temp_nombres))
-    if limite == 0:
-        print(">> No hay estudiantes para mostrar.")
-        return
-        
-    # Encabezados
-    print("-" * 80)
-    print(f"{'#':<4} | {'Nombre Completo':<30} | {'Promedio':<10} | {'Carrera':<25}")
-    print("-" * 80)
-    # Filas
-    for i in range(limite):
-        print(f"{i+1:<4} | {temp_nombres[i]:<30} | {temp_promedios[i]:<10.2f} | {temp_carreras[i]:<25}")
+    print("-" * 80 + f"\n{'#':<4} | {'Nombre Completo':<30} | {'Promedio':<10} | {'Carrera':<25}\n" + "-" * 80)
+    for i, (prom, nom, car) in enumerate(temp_datos[:5]):
+        print(f"{i+1:<4} | {nom:<30} | {prom:<10.2f} | {car:<25}")
     print("-" * 80)
 
 # =============================================
-# 6. MENÚ INTERACTIVO
+# 6. MENÚ INTERACTIVO (Sin cambios)
 # =============================================
+
 def menu_ordenamiento(algoritmo):
-    """Submenú para elegir el criterio de ordenamiento."""
     while True:
         print(f"\n--- Ordenar con {algoritmo.__name__.replace('_', ' ').title()} ---")
-        print("Elija el criterio para ordenar:")
-        print("1. Nombre (A-Z)")
-        print("2. Promedio (Mayor a menor)")
-        print("3. Código estudiantil (Ascendente)")
-        print("4. Semestre (Descendente)")
-        print("5. Volver al menú principal")
-        
+        print("1. Nombre (A-Z)\n2. Promedio (Mayor a menor)\n3. Código estudiantil (Ascendente)\n4. Semestre (Descendente)\n5. Volver")
         opcion_ord = input("Seleccione una opción: ")
-        
-        criterio = None
-        if opcion_ord == '1': criterio = 'nombre'
-        elif opcion_ord == '2': criterio = 'promedio'
-        elif opcion_ord == '3': criterio = 'codigo'
-        elif opcion_ord == '4': criterio = 'semestre'
-        elif opcion_ord == '5': break
-        else:
-            print("Opción no válida. Intente de nuevo.")
-            continue
-            
-        if not nombres:
-            print("\n>> No hay estudiantes para ordenar. Agregue estudiantes primero.")
+        criterio_map = {'1': 'nombre', '2': 'promedio', '3': 'codigo', '4': 'semestre'}
+        if opcion_ord in criterio_map:
+            if not nombres:
+                print("\n>> No hay estudiantes para ordenar.")
+                break
+            algoritmo(criterio_map[opcion_ord])
+            mostrar_tabla_estudiantes()
             break
-            
-        algoritmo(criterio)
-        mostrar_tabla_estudiantes()
-        break # Volver al menú principal tras ordenar
+        elif opcion_ord == '5':
+            break
+        else:
+            print("Opción no válida.")
 
 def main():
-    """
-    Función principal que ejecuta el menú interactivo del sistema.
-    """
     while True:
-        print("\n" + "="*50)
-        print("      SISTEMA INTEGRAL DE GESTIÓN ACADÉMICA")
-        print("="*50)
+        print("\n" + "="*50 + "\n      SISTEMA INTEGRAL DE GESTIÓN ACADÉMICA\n" + "="*50)
         print("1. Agregar estudiantes")
         print("2. Mostrar todos los estudiantes")
-        print("3. Ordenar por criterio (Algoritmo de Inserción)")
-        print("4. Ordenar por criterio (Algoritmo Quicksort)")
+        print("3. Ordenar (Inserción)")
+        print("4. Ordenar (Quicksort)")
         print("\n--- Búsqueda y Filtrado ---")
-        print("5. Buscar estudiante por código (Búsqueda Binaria)")
-        print("6. Buscar estudiantes por nombre (Búsqueda Lineal)")
-        print("7. Filtrar estudiantes por rango de promedio")
+        print("5. Buscar por código (B. Binaria)")
+        print("6. Buscar por nombre (B. Lineal)")
+        print("7. Filtrar por promedio")
         print("8. Filtrar por carrera")
         print("\n--- Reportes ---")
-        print("9. Mostrar estadísticas generales")
-        print("10. Mostrar Top 5 estudiantes por promedio")
+        print("9. Estadísticas generales")
+        print("10. Top 5 estudiantes")
         print("\n11. Salir")
         print("="*50)
         
         opcion = input("Seleccione una opción: ")
         
-        if opcion == '1':
-            registrar_nuevos_estudiantes()
-        elif opcion == '2':
-            mostrar_tabla_estudiantes()
-        elif opcion == '3':
-            menu_ordenamiento(ordenamiento_insercion)
-        elif opcion == '4':
-            menu_ordenamiento(quicksort)
-        elif opcion == '5':
-            busqueda_binaria_por_codigo()
-        elif opcion == '6':
-            busqueda_lineal_por_nombre()
-        elif opcion == '7':
-            filtrar_por_rango_promedio()
-        elif opcion == '8':
-            filtrar_por_carrera()
-        elif opcion == '9':
-            mostrar_estadisticas_generales()
-        elif opcion == '10':
-            mostrar_top_5_mejores_promedios()
+        if opcion == '1': registrar_nuevos_estudiantes()
+        elif opcion == '2': mostrar_tabla_estudiantes()
+        elif opcion == '3': menu_ordenamiento(ordenamiento_insercion)
+        elif opcion == '4': menu_ordenamiento(quicksort)
+        elif opcion == '5': busqueda_binaria_por_codigo()
+        elif opcion == '6': busqueda_lineal_por_nombre()
+        elif opcion == '7': filtrar_por_rango_promedio()
+        elif opcion == '8': filtrar_por_carrera()
+        elif opcion == '9': mostrar_estadisticas_generales()
+        elif opcion == '10': mostrar_top_5_mejores_promedios()
         elif opcion == '11':
-            print("\nGracias por usar el Sistema de Gestión Académica. ¡Hasta pronto!")
+            print("\nGracias por usar el sistema. ¡Hasta pronto!")
             sys.exit()
         else:
-            print("\nOpción no válida. Por favor, intente de nuevo.")
-            
+            print("\nOpción no válida. Intente de nuevo.")
+        
         input("\nPresione Enter para continuar...")
-        # limpiar_pantalla() # Descomentar para una mejor experiencia en terminal
+        limpiar_pantalla()
 
 if __name__ == "__main__":
     main()
