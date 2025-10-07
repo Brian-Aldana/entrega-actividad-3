@@ -5,12 +5,35 @@ import time # <--- 1. MÓDULO IMPORTADO PARA MEDIR EL TIEMPO
 # =============================================
 # 1. ESTRUCTURA DE DATOS PRINCIPAL (Listas Paralelas)
 # =============================================
-nombres = []
-codigos = []
-promedios = []
-materias_aprobadas = []
-semestres = []
-carreras = []
+# =============================================
+# 1. ESTRUCTURA DE DATOS PRINCIPAL (Listas Paralelas)
+# =============================================
+# Pega este bloque para tener datos de prueba desde el inicio
+
+nombres = [
+    "Juan David Pérez", "Sofía Ramírez", "Carlos Andrés Rojas", "Valentina Morales", 
+    "Andrés Felipe Gil", "Camila Andrea Ortiz", "Mateo Jiménez", "Isabella Castro", 
+    "Daniel Santiago Ríos", "Laura Valentina Gómez"
+]
+codigos = [
+    20231001, 20222005, 20211010, 20241003, 20202015, 
+    20231008, 20212020, 20221012, 20241002, 20201030
+]
+promedios = [
+    4.5, 3.8, 3.2, 4.9, 2.8, 4.1, 3.9, 4.8, 3.5, 4.2
+]
+materias_aprobadas = [
+    28, 22, 15, 6, 40, 25, 20, 29, 5, 45
+]
+semestres = [
+    5, 4, 3, 1, 7, 5, 4, 5, 1, 8
+]
+carreras = [
+    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
+    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
+    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
+    "Ingeniería de Software"
+]
 
 CARRERAS_DISPONIBLES = [
     "Ingeniería de Software",
