@@ -1,14 +1,5 @@
-# -*- coding: utf-8 -*-
 import sys
-import time # <--- 1. MÓDULO IMPORTADO PARA MEDIR EL TIEMPO
-
-# =============================================
-# 1. ESTRUCTURA DE DATOS PRINCIPAL (Listas Paralelas)
-# =============================================
-# =============================================
-# 1. ESTRUCTURA DE DATOS PRINCIPAL (Listas Paralelas)
-# =============================================
-# Pega este bloque para tener datos de prueba desde el inicio
+import time
 
 nombres = [
     "Juan David Pérez", "Sofía Ramírez", "Carlos Andrés Rojas", "Valentina Morales", 
@@ -149,10 +140,10 @@ def registrar_nuevos_estudiantes():
 def ordenamiento_insercion(criterio):
     global datos_ordenados_por_codigo
     n = len(nombres)
-    
+
     # Inicia el cronómetro
     inicio = time.time()
-    
+
     for i in range(1, n):
         key_nombre, key_codigo, key_promedio, key_materias, key_semestre, key_carrera = \
             nombres[i], codigos[i], promedios[i], materias_aprobadas[i], semestres[i], carreras[i]
@@ -174,10 +165,10 @@ def ordenamiento_insercion(criterio):
 
     # Detiene el cronómetro
     fin = time.time()
-    
+
     datos_ordenados_por_codigo = (criterio == 'codigo')
     print(f"\n>> Datos ordenados por '{criterio}' usando Inserción.")
-    
+
     # Retorna el tiempo transcurrido
     return fin - inicio
 
@@ -211,18 +202,18 @@ def quicksort(criterio):
     if not nombres:
         print(">> No hay estudiantes para ordenar.")
         return 0
-    
+
     # Inicia el cronómetro
     inicio = time.time()
-    
+
     quicksort_recursivo(criterio, 0, len(nombres) - 1)
-    
+
     # Detiene el cronómetro
     fin = time.time()
-    
+
     datos_ordenados_por_codigo = (criterio == 'codigo')
     print(f"\n>> Datos ordenados por '{criterio}' usando Quicksort.")
-    
+
     # Retorna el tiempo transcurrido
     return fin - inicio
 
@@ -332,27 +323,26 @@ def mostrar_top_5_mejores_promedios():
     print("-" * 80)
 
 # =============================================
-# 6. MENÚ INTERACTIVO (MODIFICADO)
+# 6. MENÚ INTERACTIVO
 # =============================================
 def menu_ordenamiento(algoritmo):
-    # --- INICIO DE LA MODIFICACIÓN ---
     while True:
         print(f"\n--- Ordenar con {algoritmo.__name__.replace('_', ' ').title()} ---")
         print("1. Nombre (A-Z)\n2. Promedio (Mayor a menor)\n3. Código (Ascendente)\n4. Semestre (Descendente)\n5. Volver")
         opcion_ord = input("Seleccione una opción: ")
         criterio_map = {'1': 'nombre', '2': 'promedio', '3': 'codigo', '4': 'semestre'}
-        
+
         if opcion_ord in criterio_map:
             if not nombres:
                 print("\n>> No hay estudiantes para ordenar.")
                 break
-            
+
             # Llama al algoritmo y recibe el tiempo de ejecución
             tiempo_transcurrido = algoritmo(criterio_map[opcion_ord])
-            
+
             # Muestra la tabla de datos ya ordenados
             mostrar_tabla_estudiantes()
-            
+
             # Imprime el tiempo de ejecución debajo de la tabla
             print(f"\n⏱️ Tiempo de ordenamiento ({algoritmo.__name__}): {tiempo_transcurrido:.6f} segundos.")
             break
@@ -360,7 +350,6 @@ def menu_ordenamiento(algoritmo):
             break
         else:
             print("Opción no válida.")
-    # --- FIN DE LA MODIFICACIÓN ---
 
 def main():
     while True:
