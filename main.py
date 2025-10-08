@@ -29,17 +29,17 @@ semestres = [
     5, 4, 3, 1, 7, 5, 4, 5, 1, 8
 ]
 carreras = [
-    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
-    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
-    "Ingeniería de Software", "Ingeniería de Software", "Ingeniería de Software", 
-    "Ingeniería de Software"
+    "Ingenieria de Software", "Ingenieria de Software", "Ingenieria de Software", 
+    "Ingenieria de Software", "Ingenieria de Software", "Ingenieria de Software", 
+    "Ingenieria de Software", "Ingenieria de Software", "Ingenieria de Software", 
+    "Ingenieria de Software"
 ]
 
 CARRERAS_DISPONIBLES = [
-    "Ingeniería de Software",
-    "Administración de Empresas",
-    "Ingeniería Ambiental",
-    "Enfermería"
+    "Ingenieria de Software",
+    "Administracion de Empresas",
+    "Ingenieria Ambiental",
+    "Enfermeria"
 ]
 
 datos_ordenados_por_codigo = False
