@@ -1,6 +1,7 @@
 import sys
 import time
 
+
 nombres = [
     "Juan David Pérez", "Sofía Ramírez", "Carlos Andrés Rojas", "Valentina Morales", 
     "Andrés Felipe Gil", "Camila Andrea Ortiz", "Mateo Jiménez", "Isabella Castro", 
@@ -73,7 +74,7 @@ def registrar_nuevos_estudiantes():
     while True:
         try:
             cantidad = int(input("Ingrese la cantidad de estudiantes a registrar (entre 10 y 50): "))
-            if 10 <= cantidad <= 50:
+            if 1 <= cantidad <= 50:
                 break
             else:
                 print("Error: La cantidad debe estar entre 10 y 50.")
@@ -322,6 +323,38 @@ def mostrar_top_5_mejores_promedios():
         print(f"{i+1:<4} | {nom:<30} | {prom:<10.2f} | {car:<25}")
     print("-" * 80)
 
+def mostrar_top_5_indice_rendimiento():
+    if not nombres:
+        print(">> No hay estudiantes registrados.")
+        return
+    
+    # Calcular índices de rendimiento para todos los estudiantes
+    indices_rendimiento = []
+    for i in range(len(nombres)):
+        # Componente del promedio (60%)
+        comp_promedio = promedios[i] * 0.60
+        # Componente de avance en la carrera (40%)
+        max_materias = semestres[i] * 6  # Máximo de materias posibles hasta el semestre actual
+        avance = (materias_aprobadas[i] / max_materias) * 5  # Normalizado a escala de 5
+        comp_avance = avance * 0.40
+        # Índice total
+        indice = comp_promedio + comp_avance
+        indices_rendimiento.append((indice, nombres[i], carreras[i], promedios[i], materias_aprobadas[i], semestres[i]))
+    
+    # Ordenar por índice de rendimiento (orden descendente)
+    indices_rendimiento.sort(reverse=True)
+    
+    print("\n--- Top 5 por Índice de Rendimiento ---")
+    print("-" * 120)
+    print(f"{'#':<4} | {'Nombre':<25} | {'Índice':<8} | {'Promedio':<8} | {'Mat. Apr.':<8} | {'Semestre':<8} | {'Carrera':<25}")
+    print("-" * 120)
+    
+    for i, (indice, nom, car, prom, mat, sem) in enumerate(indices_rendimiento[:5]):
+        print(f"{i+1:<4} | {nom:<25} | {indice:<8.2f} | {prom:<8.2f} | {mat:<8d} | {sem:<8d} | {car:<25}")
+    print("-" * 120)
+    print("\nFórmula del Índice de Rendimiento:")
+    print("(Promedio x 60%) + (Materias Aprobadas ÷ (Semestre x 6) x 5 x 40%)")
+
 # =============================================
 # 6. MENÚ INTERACTIVO
 # =============================================
@@ -365,8 +398,9 @@ def main():
         print("8. Filtrar por carrera")
         print("\n--- Reportes ---")
         print("9. Estadísticas generales")
-        print("10. Top 5 estudiantes")
-        print("\n11. Salir")
+        print("10. Top 5 por promedio")
+        print("11. Top 5 por índice de rendimiento")
+        print("\n12. Salir")
         print("="*50)
         opcion = input("Seleccione una opción: ")
         
@@ -376,12 +410,13 @@ def main():
             '4': lambda: menu_ordenamiento(quicksort),
             '5': busqueda_binaria_por_codigo, '6': busqueda_lineal_por_nombre,
             '7': filtrar_por_rango_promedio, '8': filtrar_por_carrera,
-            '9': mostrar_estadisticas_generales, '10': mostrar_top_5_mejores_promedios
+            '9': mostrar_estadisticas_generales, '10': mostrar_top_5_mejores_promedios,
+            '11': mostrar_top_5_indice_rendimiento
         }
         
         if opcion in opciones:
             opciones[opcion]()
-        elif opcion == '11':
+        elif opcion == '12':
             print("\nGracias por usar el sistema. ¡Hasta pronto!")
             sys.exit()
         else:
